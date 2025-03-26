@@ -411,52 +411,52 @@
 
 
 
-        white_pawn_a.src = "/res/Chess_plt60.png";
-        white_pawn_b.src = "/res/Chess_plt60.png";;
-        white_pawn_c.src = "/res/Chess_plt60.png";;
-        white_pawn_d.src = "/res/Chess_plt60.png";;
-        white_pawn_e.src = "/res/Chess_plt60.png";;
-        white_pawn_f.src = "/res/Chess_plt60.png";;
-        white_pawn_g.src = "/res/Chess_plt60.png";;
-        white_pawn_h.src = "/res/Chess_plt60.png";;
+        white_pawn_a.src = "./res/Chess_plt60.png";
+        white_pawn_b.src = "./res/Chess_plt60.png";;
+        white_pawn_c.src = "./res/Chess_plt60.png";;
+        white_pawn_d.src = "./res/Chess_plt60.png";;
+        white_pawn_e.src = "./res/Chess_plt60.png";;
+        white_pawn_f.src = "./res/Chess_plt60.png";;
+        white_pawn_g.src = "./res/Chess_plt60.png";;
+        white_pawn_h.src = "./res/Chess_plt60.png";;
   
 
-        black_pawn_a.src = "/res/Chess_pdt60.png";
-        black_pawn_b.src = "/res/Chess_pdt60.png";
-        black_pawn_c.src = "/res/Chess_pdt60.png";
-        black_pawn_d.src = "/res/Chess_pdt60.png";
-        black_pawn_e.src = "/res/Chess_pdt60.png";
-        black_pawn_f.src = "/res/Chess_pdt60.png";
-        black_pawn_g.src = "/res/Chess_pdt60.png";
-        black_pawn_h.src = "/res/Chess_pdt60.png";
+        black_pawn_a.src = "./res/Chess_pdt60.png";
+        black_pawn_b.src = "./res/Chess_pdt60.png";
+        black_pawn_c.src = "./res/Chess_pdt60.png";
+        black_pawn_d.src = "./res/Chess_pdt60.png";
+        black_pawn_e.src = "./res/Chess_pdt60.png";
+        black_pawn_f.src = "./res/Chess_pdt60.png";
+        black_pawn_g.src = "./res/Chess_pdt60.png";
+        black_pawn_h.src = "./res/Chess_pdt60.png";
     
         
-        white_knight_b.src = "/res/Chess_nlt60.png";
-        white_knight_g.src = "/res/Chess_nlt60.png";
+        white_knight_b.src = "./res/Chess_nlt60.png";
+        white_knight_g.src = "./res/Chess_nlt60.png";
 
-        black_knight_b.src = "/res/Chess_ndt60.png";
-        black_knight_g.src = "/res/Chess_ndt60.png";
-
-
-        white_bishop_c.src = "/res/Chess_blt60.png"; 
-        white_bishop_f.src = "/res/Chess_blt60.png"; 
-
-        black_bishop_c.src = "/res/Chess_bdt60.png"; 
-        black_bishop_f.src = "/res/Chess_bdt60.png"; 
+        black_knight_b.src = "./res/Chess_ndt60.png";
+        black_knight_g.src = "./res/Chess_ndt60.png";
 
 
-        white_rook_a.src = "/res/Chess_rlt60.png";
-        white_rook_h.src = "/res/Chess_rlt60.png";
+        white_bishop_c.src = "./res/Chess_blt60.png"; 
+        white_bishop_f.src = "./res/Chess_blt60.png"; 
 
-        black_rook_a.src = "/res/Chess_rdt60.png"; 
-        black_rook_h.src = "/res/Chess_rdt60.png"; 
+        black_bishop_c.src = "./res/Chess_bdt60.png"; 
+        black_bishop_f.src = "./res/Chess_bdt60.png"; 
+
+
+        white_rook_a.src = "./res/Chess_rlt60.png";
+        white_rook_h.src = "./res/Chess_rlt60.png";
+
+        black_rook_a.src = "./res/Chess_rdt60.png"; 
+        black_rook_h.src = "./res/Chess_rdt60.png"; 
 
         
-        white_king.src = "/res/Chess_klt60.png"; 
-        black_king.src = "/res/Chess_kdt60.png"; 
+        white_king.src = "./res/Chess_klt60.png"; 
+        black_king.src = "./res/Chess_kdt60.png"; 
         
-        white_queen.src = "/res/Chess_qlt60.png"; 
-        black_queen.src = "/res/Chess_qdt60.png"; 
+        white_queen.src = "./res/Chess_qlt60.png"; 
+        black_queen.src = "./res/Chess_qdt60.png"; 
 
 
 
@@ -534,19 +534,101 @@
         const h8 = document.getElementById("h8").children[1];
 
         
-        
-       
+        /**
+         * Can't Find a Way to highlight single tiles, without using a game loop already, 
+         * because my naive approach requires "time" i.e. differentiating user inputs which cannot be simultaneous, by definition
+         * 
+         * GAME:
+         * 1. Start Game -> 
+         * ---
+         * GAME LOOP:
+         * 2. Start Timer for White -> handleWhitesInput() -> Start Timer for Black -> handleBlacksInput()
+         * if not (Win or Draw): GOTO 2;
+         * ---
+         * 3. End Game
+        */
 
+        function handleWhitesInput()
+        {
+            //White's Turn
+            resumeWhiteTimer(timeLeft);
+            playerMove();
+        }
 
-        function logical_boardstate()
+        function handleBlacksInput()
+        {
+            //Black's Turn
+            resumeBlackTimer(timeLeft);
+            playerMove();
+        }
+                
+        function gameLoop(ending_condition)
+        {
+            if(!ending_condition)
+            {
+                //White's Turn 
+                handleWhitesInput();
+                //Black's Turn
+                handleBlacksInput();
+            }
+        }
+            
+        //Makes legal Changes in the logical boardstate
+        function playerMove()
         {}
 
+        function logicalBoardstate()
+        {}
+
+        function renderPieceToTile(piece, tile_id)
+        {
+            tile_id.append(piece)
+        }
 
         //renders board state primitive recursively from last played ply 
         //needs game history to look up player move
         //if arg == 0: initial board state
         function render_current_boardstate(last_ply_idx)
         {
+            if(last_ply_idx == 0)
+            {
+                renderPieceToTile(white_rook_a, a1);
+                renderPieceToTile(white_rook_h, h1);
+                renderPieceToTile(white_knight_b, b1);
+                renderPieceToTile(white_knight_g, g1);
+                renderPieceToTile(white_bishop_c, c1);
+                renderPieceToTile(white_bishop_f, f1); 
+                renderPieceToTile(white_queen, d1);
+                renderPieceToTile(white_king, e1);
+
+                renderPieceToTile(white_pawn_a, a2);
+                renderPieceToTile(white_pawn_b, b2);
+                renderPieceToTile(white_pawn_c, c2);                
+                renderPieceToTile(white_pawn_d, d2);
+                renderPieceToTile(white_pawn_e, e2);
+                renderPieceToTile(white_pawn_f, f2);
+                renderPieceToTile(white_pawn_g, g2);
+                renderPieceToTile(white_pawn_h, h2);
+
+                renderPieceToTile(black_rook_a, a8);
+                renderPieceToTile(black_rook_h, h8);
+                renderPieceToTile(black_knight_b, b8);
+                renderPieceToTile(black_knight_g, g8);
+                renderPieceToTile(black_bishop_c, c8);                
+                renderPieceToTile(black_bishop_f, f8);
+                renderPieceToTile(black_queen, d8); 
+                renderPieceToTile(black_king, e8);
+
+                renderPieceToTile(black_pawn_a, a7);
+                renderPieceToTile(black_pawn_b, b7);
+                renderPieceToTile(black_pawn_c, c7);
+                renderPieceToTile(black_pawn_d, d7);
+                renderPieceToTile(black_pawn_e, e7);
+                renderPieceToTile(black_pawn_f, f7);
+                renderPieceToTile(black_pawn_g, g7);
+                renderPieceToTile(black_pawn_h, h7);    
+            }
+            /*
             if(last_ply_idx == 0)
             {
                 //WHITE TEAM
@@ -586,65 +668,28 @@
                 f7.append(black_pawn_f);
                 g7.append(black_pawn_g);
                 h7.append(black_pawn_h);
-            }
+            }*/
         }
 
         render_current_boardstate(0);
 
         //Color in the tile, the player clicked on
-        function playerChoice(tile_id)
+        function playerChoice(event, last_tile_id)
         {
-            //if()
-        }
-
-        //highlight interactable tiles 
-        //query all tiles and check for empty children of child[1]
-        //doesn't matter which piece only whether tile is occupied
-
-        //entire DOM class object
-        const tile_values_dom = document.getElementsByClassName("tile");
-       
-
-        const board_container = document.getElementById("board-container");
-        console.log(board_container);
-
-
-        /*
-        UNOCCUPIED TILE
-        <div id="a8" class="tile white-tile">
-            <div class="tile-number">a8</div>
-            <div class="tile-value"></div>
-        </div>
-
-        OCCUPIED TILE
-        <div id="a8" class="tile white-tile">
-            <div class="tile-number">a8</div>
-            <div class="tile-value">
-                <img width="75" src="/res/Chess_rlt60.png">    
-            </div>
-        </div>
-        */
-
-        //alternativ: Toggle checkbox
-        //remember last clicked tile and always reset it no matter what
-        //Idee: event soll so lange in tiefe suchen bis er auf tile stößt
-        let count = 0;
-        board_container.addEventListener("click", (event) => {
-
-            //console.log("Target an sich:", event.target);
-            //console.log(count, count%2, event.target.className.substring(5, 10));
             let tile_color = event.target.className.substring(5, 10); 
             let tile_instance = event.target;
             
+            //overwrite tile_color and tile_instance based on click target
+            //force tile_instance to always be a ... tile
             if(event.target.tagName === 'IMG')
             {
-                //console.log(event.target.parentElement.parentElement.className.substring(5, 10));
+                
                 tile_color = event.target.parentElement.parentElement.className.substring(5, 10);
                 tile_instance = event.target.parentElement.parentElement;
             }
             else if (event.target.className === 'tile-value' || event.target.className === 'tile-number')
             {
-                //console.log(event.target.parentElement.className.substring(5, 10));
+                
                 tile_color = event.target.parentElement.className.substring(5, 10);
                 tile_instance = event.target.parentElement;
             }
@@ -666,6 +711,33 @@
                     tile_instance.style.backgroundColor = "rgb(39, 39, 39)";
             }
             
+            const _last_tile_id = tile_instance.id;
+            return _last_tile_id;
+            //console.log(last_tile_id); 
+        }
+
+        //highlight interactable tiles 
+        //query all tiles and check for empty children of child[1]
+        //doesn't matter which piece only whether tile is occupied
+
+        //entire DOM class object
+        const tile_values_dom = document.getElementsByClassName("tile");
+       
+
+        const board_container = document.getElementById("board-container");
+        console.log(board_container);
+
+
+        //remember last clicked tile and always reset it no matter what
+        //Idee: event soll so lange in tiefe suchen bis er auf tile stößt
+        let count = 0;
+        let last_tile_id = null;
+        board_container.addEventListener("click", (event) => {
+
+            let new_last_tile_id = playerChoice(event, last_tile_id);
+            last_tile_id = new_last_tile_id;
+            console.log(last_tile_id)
+
         });
         
                
