@@ -404,7 +404,7 @@
 
         
         const white_king = new Image(75);
-        const black_king = new Image (75) 
+        const black_king = new Image (75);
         
         const white_queen = new Image(75);
         const black_queen = new Image(75);
@@ -548,8 +548,20 @@
          * 3. End Game
         */
 
+        const board_container = document.getElementById("board-container");
+        console.log(board_container);
+
+
+        
+
+
+
+        //Players have their own little sub loops as long as the move was not made
+        //Move is made after piece was dragged to a legal tile or 
+        //in two clicks (same as chess.com) first source tile, then destination tile
         function handleWhitesInput()
         {
+            //query if real person or AI player
             //White's Turn
             resumeWhiteTimer(timeLeft);
             playerMove();
@@ -557,6 +569,7 @@
 
         function handleBlacksInput()
         {
+            //query if real person or AI player
             //Black's Turn
             resumeBlackTimer(timeLeft);
             playerMove();
@@ -572,10 +585,60 @@
                 handleBlacksInput();
             }
         }
+
+        //OK, I had a fresh idea: initial state == 'no highlighted tiles', and every click-event go initial state first
+        //like in OpenGL Draw Loops where you ``glClearColor(...)`` before you draw the next frame
+        function resetBoardHighlights()
+        {
+           
+            let whiteTiles = document.getElementsByClassName("tile white-tile");
+            let blackTiles = document.getElementsByClassName("tile black-tile");
             
+            
+            for(let i = 0; i < 32; i++)
+            {
+                whiteTiles[i].style.backgroundColor = "white";
+                blackTiles[i].style.backgroundColor = "rgb(39, 39, 39)";
+            }
+            
+        }
+        
         //Makes legal Changes in the logical boardstate
+        //(and now also handles tile highlighting)
         function playerMove()
-        {}
+        {
+            //Make Move
+            //remember last clicked tile and always reset it no matter what
+            //Idee: event soll so lange in tiefe suchen bis er auf tile stößt
+            let count = 0;
+            let last_tile_id = null;
+
+            board_container.addEventListener("click", (event) => {
+
+                resetBoardHighlights();
+                last_tile_id = playerChoice(event, last_tile_id, count);
+                
+                console.log(last_tile_id)
+
+            });
+
+
+
+            var finished = false
+
+
+            while(!finished)
+            {
+                
+                count++;
+                
+                
+                finished = true
+            }
+            console.log(count + " iterations");
+        }
+
+        playerMove();
 
         function logicalBoardstate()
         {}
@@ -674,7 +737,7 @@
         render_current_boardstate(0);
 
         //Color in the tile, the player clicked on
-        function playerChoice(event, last_tile_id)
+        function playerChoice(event, last_tile_id, count)
         {
             let tile_color = event.target.className.substring(5, 10); 
             let tile_instance = event.target;
@@ -696,7 +759,6 @@
             
             if(tile_color === 'white')
             {
-                count++;
                 if(count % 2 === 1)
                     tile_instance.style.backgroundColor = "aquamarine";
                 else 
@@ -704,7 +766,6 @@
             }
             else if(tile_color === 'black')
             {
-                count++;
                 if(count % 2 === 1)
                     tile_instance.style.backgroundColor = "aquamarine";
                 else 
@@ -716,29 +777,7 @@
             //console.log(last_tile_id); 
         }
 
-        //highlight interactable tiles 
-        //query all tiles and check for empty children of child[1]
-        //doesn't matter which piece only whether tile is occupied
-
-        //entire DOM class object
-        const tile_values_dom = document.getElementsByClassName("tile");
-       
-
-        const board_container = document.getElementById("board-container");
-        console.log(board_container);
-
-
-        //remember last clicked tile and always reset it no matter what
-        //Idee: event soll so lange in tiefe suchen bis er auf tile stößt
-        let count = 0;
-        let last_tile_id = null;
-        board_container.addEventListener("click", (event) => {
-
-            let new_last_tile_id = playerChoice(event, last_tile_id);
-            last_tile_id = new_last_tile_id;
-            console.log(last_tile_id)
-
-        });
+  
         
                
       
