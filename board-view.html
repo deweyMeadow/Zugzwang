@@ -607,35 +607,81 @@
         //(and now also handles tile highlighting)
         function playerMove()
         {
-            //Make Move
-            //remember last clicked tile and always reset it no matter what
-            //Idee: event soll so lange in tiefe suchen bis er auf tile stößt
-            let count = 0;
-            let last_tile_id = null;
+            let ownPieceChosen = false;
+            let chosen_piece_tile_id = null;
 
+            //tile highlighting
+            //and piece selection
+            //and piece movement
             board_container.addEventListener("click", (event) => {
 
                 resetBoardHighlights();
-                last_tile_id = playerChoice(event, last_tile_id, count);
-                
-                console.log(last_tile_id)
 
+                if(ownPieceChosen === true)
+                {
+                    //TODO: Make sure i address the tile again, not the IMG
+                    if(event.target.id !== chosen_piece_tile_id)
+                    {
+                        //potential move
+                        //check for legality now
+                        console.log("This should be a move, since: " + chosen_piece_tile_id + " and " + event.target.id + " are different");
+                        //don't hit my own piece
+                        //TODO: definitely refactor with sets, using set.has() in conditions, it is not efficient but justified
+                        if(!(event.target.children[1].children[0].src == "./res/Chess_klt60.png"))
+                        {
+                            console.log("I am not hitting the king!");
+                        }
+                        else 
+                        {
+                            console.log("I am hitting the king!");
+                        }
+
+                        //let potential_move = [piece, chosen_piece_tile_id];
+                    }
+
+                    ownPieceChosen = false;
+                }
+                else
+                {
+                    console.log("FIRST CLICK: PLAYER CHOOSES PIECE");
+                    
+                    chosen_piece_tile_id = playerChoice(event);
+
+                    //This feels like a hack
+                    //Should be easily refactored
+                    let piece = document.getElementById(chosen_piece_tile_id).children[1].children[0];
+                    
+                    if(piece == null)
+                    {
+                        console.log("no piece");
+                        ownPieceChosen = false;
+                        //return;
+                    }
+                    else
+                    {
+                        console.log(piece);
+                        ownPieceChosen = true;
+                    }
+
+
+                    
+                    
+                } 
+
+                
+                
+    
             });
 
+            //piece movement
+            board_container.addEventListener("drop", (event) => {
+                if (event.target.id !== last_tile_id) {
+                    let piece = document.getElementById(last_tile_id).children[1].children[0];
+                    console.log(piece);
+                    renderPieceToTile(piece, last_tile_id);
+                }
+            });
 
-
-            var finished = false
-
-
-            while(!finished)
-            {
-                
-                count++;
-                
-                
-                finished = true
-            }
-            console.log(count + " iterations");
         }
 
         playerMove();
@@ -736,50 +782,26 @@
 
         render_current_boardstate(0);
 
-        //Color in the tile, the player clicked on
-        function playerChoice(event, last_tile_id, count)
+        function playerChoice(event)
         {
-            let tile_color = event.target.className.substring(5, 10); 
             let tile_instance = event.target;
             
             //overwrite tile_color and tile_instance based on click target
             //force tile_instance to always be a ... tile
             if(event.target.tagName === 'IMG')
             {
-                
-                tile_color = event.target.parentElement.parentElement.className.substring(5, 10);
                 tile_instance = event.target.parentElement.parentElement;
             }
             else if (event.target.className === 'tile-value' || event.target.className === 'tile-number')
             {
-                
-                tile_color = event.target.parentElement.className.substring(5, 10);
                 tile_instance = event.target.parentElement;
             }
-            
-            if(tile_color === 'white')
-            {
-                if(count % 2 === 1)
-                    tile_instance.style.backgroundColor = "aquamarine";
-                else 
-                    tile_instance.style.backgroundColor = "white";
-            }
-            else if(tile_color === 'black')
-            {
-                if(count % 2 === 1)
-                    tile_instance.style.backgroundColor = "aquamarine";
-                else 
-                    tile_instance.style.backgroundColor = "rgb(39, 39, 39)";
-            }
-            
-            const _last_tile_id = tile_instance.id;
-            return _last_tile_id;
-            //console.log(last_tile_id); 
-        }
+            tile_instance.style.backgroundColor = "aquamarine";
 
-  
-        
-               
+            return tile_instance.id;
+
+        }
+           
       
         function check_if_occupied()
         {
