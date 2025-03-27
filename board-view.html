@@ -552,6 +552,43 @@
         console.log(board_container);
 
 
+        function forceEventTargetToTile(event)
+        {
+            let tile_instance = event.target;
+            if(event.target.tagName === 'IMG')
+            {
+                tile_instance = event.target.parentElement.parentElement;
+                console.log(tile_instance.tagName + " Should not be a IMG");
+            }
+            else if (event.target.className === 'tile-value' || event.target.className === 'tile-number')
+            {
+                tile_instance = event.target.parentElement;
+                console.log(tile_instance.className + " Should not be a tile-value or tile-number");
+            }
+            else 
+            {
+                tile_instance = event.target;
+                console.log(tile_instance.className + " Should be a tile");
+            }
+
+            return tile_instance;
+        }
+           
+
+        function playerChoice(event)
+        {
+            
+            //overwrite tile_color and tile_instance based on click target
+            //force tile_instance to always be a ... tile
+            
+            let tile_instance = forceEventTargetToTile(event);
+            
+            tile_instance.style.backgroundColor = "aquamarine";
+
+            return tile_instance.id;
+
+        }
+
         
 
 
@@ -619,24 +656,56 @@
 
                 if(ownPieceChosen === true)
                 {
+                    const potentialTile = forceEventTargetToTile(event);
+                    console.log("Potential Move: " + potentialTile.id);
                     //TODO: Make sure i address the tile again, not the IMG
-                    if(event.target.id !== chosen_piece_tile_id)
+                    if(potentialTile.id !== chosen_piece_tile_id)
                     {
                         //potential move
                         //check for legality now
-                        console.log("This should be a move, since: " + chosen_piece_tile_id + " and " + event.target.id + " are different");
-                        //don't hit my own piece
+                        
+
+                        //IDEA: Check wether Tile is occupied, and then check in piece object for color value -> no need for set membership check
+                        //Also tile.children[1].children[0] === null und dann von tile.children[1].children[0]
+
+
+                        
                         //TODO: definitely refactor with sets, using set.has() in conditions, it is not efficient but justified
-                        if(!(event.target.children[1].children[0].src == "./res/Chess_klt60.png"))
+
+                        //Priority should be:
+                        //1. Can this piece in particular move to desired destination tile
+                        //2. Is this tile occupied? IF not: legal
+                        //3. Is this tile occupied by the opposite color? IF YES: legal
+
+                        console.log("Potential Tile: ", potentialTile);
+                        const pieceOnTile = potentialTile.children[1].children[0];
+
+
+                        //check wether tile is occupied
+                        if(pieceOnTile == null)
                         {
-                            console.log("I am not hitting the king!");
+                            console.log("I can probably go here!");
                         }
-                        else 
-                        {
-                            console.log("I am hitting the king!");
+                        else
+                        {   //unelegant, only works for white, this way
+                            if(    pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_klt60.png" 
+                                || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_plt60.png"
+                                || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_nlt60.png"
+                                || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_blt60.png"
+                                || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_rlt60.png"
+                                || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_qlt60.png"
+                            )
+                            {
+                                console.log("I can't go here! It is me own coloor");
+                            }
+                            else
+                            {
+                                console.log("LEGAL MOVE : I can go here! It is not me own coloor : LEGAL MOVE");
+                            }
+                            
+                            
                         }
 
-                        //let potential_move = [piece, chosen_piece_tile_id];
                     }
 
                     ownPieceChosen = false;
@@ -782,26 +851,8 @@
 
         render_current_boardstate(0);
 
-        function playerChoice(event)
-        {
-            let tile_instance = event.target;
-            
-            //overwrite tile_color and tile_instance based on click target
-            //force tile_instance to always be a ... tile
-            if(event.target.tagName === 'IMG')
-            {
-                tile_instance = event.target.parentElement.parentElement;
-            }
-            else if (event.target.className === 'tile-value' || event.target.className === 'tile-number')
-            {
-                tile_instance = event.target.parentElement;
-            }
-            tile_instance.style.backgroundColor = "aquamarine";
 
-            return tile_instance.id;
-
-        }
-           
+   
       
         function check_if_occupied()
         {
