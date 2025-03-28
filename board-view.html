@@ -601,7 +601,49 @@
             //query if real person or AI player
             //White's Turn
             resumeWhiteTimer(timeLeft);
-            playerMove();
+            playerMove(white);
+        }
+        
+        //IDEA, after refactor: Check wether Tile(tile_id) is occupied, and then check in piece object for color value -> no need for set membership check
+        //Also tile.children[1].children[0] === null und dann von tile.children[1].children[0]
+        function canWhiteGoHere(tile_id)
+        {
+            //Priority should be:
+            //1. Can this piece in particular move to desired destination tile
+            //2. Is this tile occupied? IF not: legal
+            //3. Is this tile occupied by the opposite color? IF YES: legal
+
+            console.log("Potential Tile: ", potentialTile);
+            const pieceOnTile = potentialTile.children[1].children[0];
+
+
+            //check wether tile is occupied
+            if(pieceOnTile == null)
+            {
+                console.log("I can probably go here!");
+                return true;
+            }
+            else
+            {   //unelegant, only works for white, this way
+                if(    pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_klt60.png" 
+                    || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_plt60.png"
+                    || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_nlt60.png"
+                    || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_blt60.png"
+                    || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_rlt60.png"
+                    || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_qlt60.png"
+                )
+                {
+                    console.log("I can't go here! It is me own coloor");
+                    return false;
+                }
+                else
+                {
+                    console.log("LEGAL MOVE : I can go here! It is not me own coloor : LEGAL MOVE");
+                    return true;
+                }
+                
+                
+            }
         }
 
         function handleBlacksInput()
@@ -609,7 +651,48 @@
             //query if real person or AI player
             //Black's Turn
             resumeBlackTimer(timeLeft);
-            playerMove();
+            playerMove(black);
+        }
+
+        function canBlackGoHere(tile_id)
+        {
+            //Priority should be:
+            //1. Can this piece in particular move to desired destination tile
+            //2. Is this tile occupied? IF not: legal
+            //3. Is this tile occupied by the opposite color? IF YES: legal
+
+            console.log("Potential Tile: ", potentialTile);
+            const pieceOnTile = potentialTile.children[1].children[0];
+
+
+            //check wether tile is occupied
+            if(pieceOnTile == null)
+            {
+                console.log("I can probably go here!");
+                return true;
+            }
+            else
+            {   //unelegant, only works for white, this way
+                if(    pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_kbt60.png" 
+                    || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_pbt60.png"
+                    || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_nbt60.png"
+                    || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_bbt60.png"
+                    || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_rbt60.png"
+                    || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_qbt60.png"
+                )
+                {
+                    console.log("I can't go here! It is me own coloor");
+                    return false;
+                }
+                else
+                {
+                    console.log("LEGAL MOVE : I can go here! It is not me own coloor : LEGAL MOVE");
+                    return true;
+                }
+                
+                
+            }
+
         }
                 
         function gameLoop(ending_condition)
@@ -642,10 +725,13 @@
         
         //Makes legal Changes in the logical boardstate
         //(and now also handles tile highlighting)
-        function playerMove()
+        function playerMove(color)
         {
             let ownPieceChosen = false;
+            let lockedInMove = false;
             let chosen_piece_tile_id = null;
+
+            //determine whether to wait for a human player or whether AI can start computation
 
             //tile highlighting
             //and piece selection
@@ -658,56 +744,32 @@
                 {
                     const potentialTile = forceEventTargetToTile(event);
                     console.log("Potential Move: " + potentialTile.id);
-                    //TODO: Make sure i address the tile again, not the IMG
+                    
                     if(potentialTile.id !== chosen_piece_tile_id)
                     {
                         //potential move
                         //check for legality now
                         
-
-                        //IDEA: Check wether Tile is occupied, and then check in piece object for color value -> no need for set membership check
-                        //Also tile.children[1].children[0] === null und dann von tile.children[1].children[0]
-
-
-                        
-                        //TODO: definitely refactor with sets, using set.has() in conditions, it is not efficient but justified
-
-                        //Priority should be:
-                        //1. Can this piece in particular move to desired destination tile
-                        //2. Is this tile occupied? IF not: legal
-                        //3. Is this tile occupied by the opposite color? IF YES: legal
-
-                        console.log("Potential Tile: ", potentialTile);
-                        const pieceOnTile = potentialTile.children[1].children[0];
-
-
-                        //check wether tile is occupied
-                        if(pieceOnTile == null)
+                        if(color === white)
                         {
-                            console.log("I can probably go here!");
-                        }
-                        else
-                        {   //unelegant, only works for white, this way
-                            if(    pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_klt60.png" 
-                                || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_plt60.png"
-                                || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_nlt60.png"
-                                || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_blt60.png"
-                                || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_rlt60.png"
-                                || pieceOnTile.src.substr(pieceOnTile.src.length - 20) === "/res/Chess_qlt60.png"
-                            )
+                            //handle move and return right to move to opponent
+                            lockedInMove = canWhiteGoHere(potentialTile);
+                            if(lockedInMove)
                             {
-                                console.log("I can't go here! It is me own coloor");
+                                console.log("White played, moving right goes to black");
                             }
-                            else
+                        }
+                        else if(color === black)
+                        {
+                            //handle move and return right to move to opponent
+                            lockedInMove = canBlackGoHere(potentialTile);
+                            if(lockedInMove)
                             {
-                                console.log("LEGAL MOVE : I can go here! It is not me own coloor : LEGAL MOVE");
+                                console.log("black played, moving right goes to white");
                             }
                             
-                            
                         }
-
                     }
-
                     ownPieceChosen = false;
                 }
                 else
@@ -730,16 +792,8 @@
                     {
                         console.log(piece);
                         ownPieceChosen = true;
-                    }
-
-
-                    
-                    
+                    }  
                 } 
-
-                
-                
-    
             });
 
             //piece movement
